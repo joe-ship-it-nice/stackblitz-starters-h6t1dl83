@@ -1,6 +1,6 @@
 # 🥱 I am Bored
 
-### Because staring at the ceiling is not a hobby.
+### Because staring at the ceiling for 6 hours is not a hobby.
 
 **I am Bored** is an activity discovery dashboard for those moments when your brain says:
 
