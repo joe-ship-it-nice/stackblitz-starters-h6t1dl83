@@ -1,5 +1,6 @@
 // Store the current activity
 let currentActivity = "";
+let currentParticipants = "";
 // Store all saved activities
 const savedActivities = [];
 
@@ -55,44 +56,83 @@ async function getActivity() {
   // Get elements from the HTML
   const activityDisplay =
     document.getElementById("activity");
+  const participantsDisplay =
+    document.getElementById("participants");
   const activityMessage =
     document.getElementById("activity-message");
   const saveButton =
     document.getElementById("save-button");
-
-  // Tell the user that data is loading
+  // Show loading message
   activityDisplay.textContent = "Loading...";
+  participantsDisplay.textContent =
+    "Suitable for how many persons: Loading...";
   activityMessage.textContent = "";
   // Disable Save while loading
   saveButton.disabled = true;
 
   try {
-    // Send a GET request to the API
+    // ADDED: stop the request if it takes too long
+    const controller = new AbortController();
+    const timeout = setTimeout(function () {
+      controller.abort();
+    }, 8000);
+    console.log("Starting fetch...");
+    // Fetch activity
     const response = await fetch(
-      "https://random-activity-sigmo.vercel.app/api/random"
+      "https://random-activity-sigmo.vercel.app/api/random",
+      {
+        signal: controller.signal
+      }
     );
-    // Check whether the request worked
+    // Stop the timeout because fetch succeeded
+    clearTimeout(timeout);
+    console.log("Fetch finished:", response);
+    // Check if the API request was successful
     if (!response.ok) {
       throw new Error("Could not get activity");
     }
-    // Convert the JSON response into JavaScript
+    // Convert response to JavaScript object
     const data = await response.json();
-    // Store the activity
-    currentActivity = data.activity;
-    // Display activity on the webpage
+    console.log("API data:", data);
+
+    // Handle missing activity field
+    currentActivity =
+      data.activity ?? "Activity not available";
+
+    // Handle missing participants field
+    currentParticipants =
+      data.participants ?? "Not known, depends";
+
+    // Display the activity
     activityDisplay.textContent =
       currentActivity;
-    // Allow user to save it
+
+    // Display participants
+    participantsDisplay.textContent =
+      "Suitable for how many persons: " +
+      currentParticipants;
+
+    // Enable Save button
     saveButton.disabled = false;
+
   } catch (error) {
-    // Display an error if the API does not work
+    // Reset current values
+    currentActivity = "";
+    currentParticipants = "";
+
     activityDisplay.textContent =
       "Unable to load an activity.";
+
+    participantsDisplay.textContent =
+      "Suitable for how many persons: -";
+
     activityMessage.textContent =
       "Please try again.";
+
     activityMessage.className =
       "text-danger mt-3";
-    console.log(error);
+
+    console.error("API ERROR:", error);
   }
 }
 
