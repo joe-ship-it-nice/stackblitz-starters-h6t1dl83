@@ -94,24 +94,19 @@ async function getActivity() {
     // Convert response to JavaScript object
     const data = await response.json();
     console.log("API data:", data);
-
     // Handle missing activity field
     currentActivity =
       data.activity ?? "Activity not available";
-
     // Handle missing participants field
     currentParticipants =
-      data.participants ?? "Not known, depends";
-
+      data.participants ?? "Suitable for: Not known, depends on your preference.";
     // Display the activity
     activityDisplay.textContent =
       currentActivity;
-
     // Display participants
     participantsDisplay.textContent =
       "Suitable for how many persons: " +
       currentParticipants;
-
     // Enable Save button
     saveButton.disabled = false;
 
@@ -119,19 +114,14 @@ async function getActivity() {
     // Reset current values
     currentActivity = "";
     currentParticipants = "";
-
     activityDisplay.textContent =
       "Unable to load an activity.";
-
     participantsDisplay.textContent =
       "Suitable for how many persons: -";
-
     activityMessage.textContent =
       "Please try again.";
-
     activityMessage.className =
       "text-danger mt-3";
-
     console.error("API ERROR:", error);
   }
 }
